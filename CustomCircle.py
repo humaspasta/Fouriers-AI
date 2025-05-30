@@ -10,8 +10,10 @@ class CustomCircle:
         self.angle = 0
         self.angle_change = angle_change
         self.isTip = isTip
+        
 
     def draw_circle(self):
+        trace_points = []
         '''
         Draws circle along with rotating radius
         '''
@@ -25,12 +27,14 @@ class CustomCircle:
 
         # Draw radius line
         cv2.line(self.frame, (self.x, self.y), (int(x_rot) , int(y_rot)), 100, 1)
-           
+        trace_points.append(self.calculate_rotate())
+        print(trace_points)
 
         self.angle += self.angle_change
 
         if self.angle > 2 * math.pi:
             self.angle -= 2 * math.pi
+            trace_points = []
 
 
     
@@ -54,14 +58,16 @@ class CustomCircle:
         y_rot = self.y - self.radius * math.sin(self.angle)
         return (x_rot , y_rot)
     
-    def trace(self, x_rot , y_rot):
+    def trace(self):
         if self.isTip:
-            self.frame[int(y_rot) , int(x_rot)] = (0,0,0)
+            self.frame[int(self.calculate_rotate()[1]) , int(self.calculate_rotate()[0])] = (0,0,0)
+            self.set_frame(self.frame)
 
     
     def update_position(self , x , y):
         self.x = x
         self.y = y
     
+
             
         
