@@ -1,0 +1,46 @@
+import cv2
+import numpy as np
+import math
+import time
+from CustomCircle import CustomCircle
+
+# Set up canvas
+width, height = 600, 600
+center = (width // 2, height // 2)
+radius = 150
+
+# Frame setup
+angle = 0
+fps = 60
+delay = 1 / fps
+circ = CustomCircle(None, 300 , 300, 50 , 0.02) # there is no frame initially. The frame is updated in the loop
+circ2 = CustomCircle(None , int(circ.calculate_rotate()[0]), int(circ.calculate_rotate()[1]), 30 , 0.05)
+circ3 = CustomCircle(None , int(circ2.calculate_rotate()[0]), int(circ2.calculate_rotate()[1]) , 10 , 1, isTip=True)
+frame = np.ones((height, width, 3), dtype=np.uint8) * 255
+while True:
+    frame = np.ones((height, width, 3), dtype=np.uint8) * 255
+    # Create a white canvas
+    circ.set_frame(frame)
+    circ2.set_frame(frame)
+    circ3.set_frame(frame)
+    
+    circ.draw_circle()
+
+
+    circ2.update_position(int(circ.calculate_rotate()[0]), int(circ.calculate_rotate()[1]))
+    circ2.draw_circle()
+
+    circ3.update_position(int(circ2.calculate_rotate()[0]), int(circ2.calculate_rotate()[1]))
+    circ3.draw_circle()
+    circ3.trace(int(circ3.calculate_rotate()[0]), int(circ3.calculate_rotate()[1]))
+
+    # Show frame
+    cv2.imshow("Rotating Radius - Sin/Cos", frame)
+
+    # Break with 'q'
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+    time.sleep(delay)
+
+cv2.destroyAllWindows()
