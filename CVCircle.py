@@ -28,8 +28,7 @@ while True:
     circ3.set_frame(frame)
 
     #tracing point
- 
-   
+
     # Create a white canvas
     circ.draw_circle()
     circ2.update_position(int(circ.calculate_rotate()[0]), int(circ.calculate_rotate()[1]))
