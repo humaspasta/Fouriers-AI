@@ -23,6 +23,9 @@ class Learning(pl.LightningModule):
         loss = self.loss_fn(y_pred, y)
         self.log("train_loss", loss)
         return loss
+    def on_train_epoch_end(self):
+        #drawing code here
+        print("Epoch complete")
     
         
 
