@@ -5,6 +5,7 @@ import time
 from CustomCircle import CustomCircle
 
 
+import torch
 
 # Set up canvas
 width, height = 600, 600
@@ -23,6 +24,7 @@ frame_trace = np.ones((height, width, 3), dtype=np.uint8) * 255
 
 while True:
     frame = np.ones((height, width, 3), dtype=np.uint8) * 255
+    #frame = torch.ones(height , width, 3) * 255
     circ.set_frame(frame)
     circ2.set_frame(frame)
     circ3.set_frame(frame)

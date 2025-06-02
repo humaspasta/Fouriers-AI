@@ -36,8 +36,6 @@ class CustomCircle:
             self.angle -= 2 * math.pi
             trace_points = []
 
-
-    
     def set_frame(self, frame):
         '''
         Sets the circles frame. Frame must be set before 
@@ -57,6 +55,7 @@ class CustomCircle:
         x_rot = self.x + self.radius * math.cos(self.angle)
         y_rot = self.y - self.radius * math.sin(self.angle)
         return (x_rot , y_rot)
+    
     
     def trace(self):
         if self.isTip:
