@@ -14,6 +14,6 @@ class MyDataset(Dataset):
         x = torch.tensor(self.data[idx] , dtype=torch.float32)
         y = torch.tensor(self.labels[idx] , dtype=torch.float32)
         return x, y
-    
+
 
 
