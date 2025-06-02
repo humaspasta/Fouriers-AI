@@ -64,6 +64,9 @@ class CustomCircle:
 
     
     def update_position(self , x , y):
+        '''
+        Updates the position of the circle
+        '''
         self.x = x
         self.y = y
     

@@ -36,7 +36,7 @@ cv2.circle(frame , height//2, width//2, (200,0,0), 1)
 
 
 
-dataset = MyDataset(frame, np.random.rand(7))
+
 data_loader = DataLoader(dataset, batch_size=16)
 
 for epoch in range(5):
