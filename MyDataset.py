@@ -4,7 +4,6 @@ from torch.utils.data import Dataset
 class MyDataset(Dataset):
     def __init__(self, data, labels):
         self.data = data #scalars representing overall rotation angle
-
         self.labels = labels # tensor representing positions (x,y) that the point should be at
 
     def __len__(self): 

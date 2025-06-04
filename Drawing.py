@@ -3,6 +3,7 @@ from CustomCircle import CustomCircle
 import numpy as np
 from Learning import Learning
 import time
+import math
 
 class Drawing:
     def __init__(self, length , width):
@@ -10,10 +11,11 @@ class Drawing:
         self.width = width
         self.frame = np.ones((self.length, self.width, 3), dtype=np.uint8) * 255
 
-
         self.circ = CustomCircle(None, 300 , 300, 100 , 0.02) # there is no frame initially. The frame is updated in the loop
-        self.circ2 = CustomCircle(None , int(self.circ.calculate_rotate()[0]), int(self.circ.calculate_rotate()[1]), 30 , 0.05)
-        self.circ3 = CustomCircle(None , int(self.circ2.calculate_rotate()[0]), int(self.circ2.calculate_rotate()[1]) , 10 , 0.07, isTip=True)
+        self.circ2 = CustomCircle(None , int(self.circ.calculate_rotate()[0]), int(self.circ.calculate_rotate()[1]), 50 , 0.05)
+        self.circ3 = CustomCircle(None , int(self.circ2.calculate_rotate()[0]), int(self.circ2.calculate_rotate()[1]) , 25 , 0.07)
+        self.circ4 = CustomCircle(None , int(self.circ3.calculate_rotate()[0]), int(self.circ3.calculate_rotate()[1]), 12, 0.03)
+        self.circ5 = CustomCircle(None , int(self.circ3.calculate_rotate()[0]), int(self.circ3.calculate_rotate()[1]) , 6 , 0.05, isTip = True)
 
 
     def get_approximations():
@@ -26,9 +28,27 @@ class Drawing:
         self.circ.set_frame(frame)
         self.circ2.set_frame(frame)
         self.circ3.set_frame(frame)
+        self.circ4.set_frame(frame)
+        self.circ5.set_frame(frame)
+    
+    def set_tip_frame(self , frame):
+        self.circ5.set_frame(frame)
 
-    def draw_all_circles(self):
-        # Set up canvas
+    def get_tip_frame(self):
+        return self.circ5.get_frame()
+    
+    def set_circle_frequencies(self , frequencies:tuple):
+        freq1, freq2, freq3, freq4, freq5 = frequencies
+
+        self.circ.set_frequency(freq1)
+        self.circ2.set_frequency(freq2)
+        self.circ3.set_frequency(freq3)
+        self.circ4.set_frequency(freq4)
+        self.circ5.set_frequency(freq5)
+
+    
+
+    def draw_all_circles(self, one_rotation=False):
         width, height = 600, 600
         center = (width // 2, height // 2)
         radius = 150
@@ -40,31 +60,76 @@ class Drawing:
        
         frame_trace = np.ones((height, width, 3), dtype=np.uint8) * 255
 
-        while True:
-            frame = np.ones((height, width, 3), dtype=np.uint8) * 255
-            #frame = torch.ones(height , width, 3) * 255
-            self.set_all_frames(frame)
-            #tracing point
+        if(one_rotation):
+            x_0 , y_0 = self.circ.get_center()
+            
+            while self.calculate_current_theta(x_0 , y_0) < 2 * math.pi:
+                frame = np.ones((height, width, 3), dtype=np.uint8) * 255
+                #frame = torch.ones(height , width, 3) * 255
+                self.set_all_frames(frame)
+                #tracing point
 
-            # Create a white canvas
-            self.circ.draw_circle()
-            self.circ2.update_position(int(self.circ.calculate_rotate()[0]), int(self.circ.calculate_rotate()[1]))
-            self.circ2.draw_circle()
+                # Create a white canvas
+                self.circ.draw_circle()
+                self.circ2.update_position(int(self.circ.calculate_rotate()[0]), int(self.circ.calculate_rotate()[1]))
+                self.circ2.draw_circle()
 
-            self.circ3.update_position(int(self.circ2.calculate_rotate()[0]), int(self.circ2.calculate_rotate()[1]))
-            self.circ3.draw_circle()
-            #cv2.circle(frame_trace, (int(self.circ3.calculate_rotate()[0]), int(self.circ3.calculate_rotate()[1])), radius=1, color=(0, 0, 0), thickness=-1)
-            # Show frame
+                self.circ3.update_position(int(self.circ2.calculate_rotate()[0]), int(self.circ2.calculate_rotate()[1]))
+                self.circ3.draw_circle()
 
-            cv2.imshow("Rotating Radius - Sin/Cos", frame)
+                self.circ4.update_position(int(self.circ3.calculate_rotate()[0]), int(self.circ3.calculate_rotate()[1]))
+                self.circ4.draw_circle()
 
-            # Break with 'q'
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
+                self.circ5.update_position(int(self.circ4.calculate_rotate()[0]), int(self.circ4.calculate_rotate()[1]))
+                self.circ5.draw_circle()
 
-            time.sleep(delay)
+                #point circle
+                cv2.circle(frame_trace , (), 1, (0,0,0), 1, cv2.LINE_AA) # point that traces values of overall rotation on second frame
+
+                cv2.imshow("Rotating Radius - Training", frame)
+
+                # Break with 'q'
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    break
+
+                time.sleep(delay)
+        else:
+            while True:
+                frame = np.ones((height, width, 3), dtype=np.uint8) * 255
+                #frame = torch.ones(height , width, 3) * 255
+                self.set_all_frames(frame)
+                #tracing point
+
+                # Create a white canvas
+                self.circ.draw_circle()
+                self.circ2.update_position(int(self.circ.calculate_rotate()[0]), int(self.circ.calculate_rotate()[1]))
+                self.circ2.draw_circle()
+
+                self.circ3.update_position(int(self.circ2.calculate_rotate()[0]), int(self.circ2.calculate_rotate()[1]))
+                self.circ3.draw_circle()
+
+                self.circ4.update_position(int(self.circ3.calculate_rotate()[0]), int(self.circ3.calculate_rotate()[1]))
+                self.circ4.draw_circle()
+
+                self.circ5.update_position(int(self.circ4.calculate_rotate()[0]), int(self.circ4.calculate_rotate()[1]))
+                self.circ5.draw_circle()
+
+                cv2.imshow("Rotating Radius - actual", frame)
+
+                # Break with 'q'
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    break
+
+                time.sleep(delay)
 
         cv2.destroyAllWindows()
+        return frame_trace
+
+    
+    def calculate_current_theta(self, x_0 , y_0):
+        x , y = self.circ5.calculate_rotate()
+        return math.asin(y - y_0 / ((y-y_0)**2 + (x-x_0)**2))
+
 
 
     

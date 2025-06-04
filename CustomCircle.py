@@ -42,11 +42,14 @@ class CustomCircle:
         '''
         self.frame = frame
         
-    def get_center(self):
+    def get_center(self) -> tuple:
         '''
         Returns the center of the current circle
         '''
         return (self.x , self.y)
+    
+    def get_angle(self):
+        return self.angle
 
     def calculate_rotate(self):
         '''
@@ -56,12 +59,17 @@ class CustomCircle:
         y_rot = self.y - self.radius * math.sin(self.angle)
         return (x_rot , y_rot)
     
+    def set_frequency(self, angle_change:float):
+        self.angle_change = angle_change
+    
     
     def trace(self):
         if self.isTip:
             self.frame[int(self.calculate_rotate()[1]) , int(self.calculate_rotate()[0])] = (0,0,0)
             self.set_frame(self.frame)
 
+    def get_frame(self):
+        return self.frame
     
     def update_position(self , x , y):
         '''

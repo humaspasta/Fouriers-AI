@@ -6,12 +6,13 @@ from MyDataset import MyDataset
 import numpy as np
 import cv2
 from CustomCircle import CustomCircle
+from Drawing import Drawing
 import pandas as pd
 import matplotlib.pyplot as plt
 import math
 
 class Learning(pl.LightningModule):
-    def __init__(self , tip_circle:CustomCircle):
+    def __init__(self):
         super().__init__()
         self.layer1 = nn.Linear(7 , 14, True)
         self.activation = nn.ReLU()
@@ -19,9 +20,9 @@ class Learning(pl.LightningModule):
         self.loss_fn= nn.MSELoss()
     
     def forward(self , x):
-        self.layer1(x)
-        self.activation(x)
-        self.layer2(x)
+        x = self.layer1(x)
+        x = self.activation(x)
+        x = self.layer2(x)
         return x
     
     def training_step(self , batch , batchidx):
@@ -48,15 +49,11 @@ width, height = 600, 600
 frame = np.ones((height, width, 3), dtype=np.uint8) * 255
 cv2.circle(frame , (height//2, width//2),200, (0,0,0), thickness=1)
 
-print(frame.shape)
 points = []
 for y in range(len(frame)):
     for x in range(len(frame[y])):
         if(frame[y, x][0] == 0):
             points.append((y,x))
-
-
-
 
 points.sort(key=lambda x: (x[0] , x[1]) ,reverse=True)
 
@@ -71,34 +68,79 @@ bottom_half_x_points = [point[0] for point in bottom_half_points]
 bottom_half_y_points = [point[1] for point in bottom_half_points]
 
 
-
-x_points = [point[0] for point in points]
-y_points = [point[1] for point in points]
-theta_points = np.arange(start=0 , stop=2 * math.pi, step=2 * math.pi / len(x_points))
-
-points_df = pd.DataFrame({
-    'theta': theta_points,
-    'X Points' : x_points,
-    'Y_Points' : y_points,
-})
-
 x_in_order = top_half_x_points + bottom_half_x_points
 y_in_order = bottom_half_y_points + bottom_half_y_points
 
-print(len(x_in_order))
-print(len(y_in_order))
-theta_in_ordre = np.arange(start=0 , stop=2 * math.pi , step=2 * math.pi / len(x_in_order))
+coords_in_order = []
+for i in range(len(x_in_order)):
+    coords_in_order.append((x_in_order[i] , y_in_order[i]))
+
+
+theta_in_order = np.arange(start=0 , stop=6 , step=6 / len(coords_in_order))
 
 final_df = pd.DataFrame({
-    'theta' : theta_in_ordre,
-    'x_points' : x_in_order,
-    'y_points' : y_in_order,
+    'theta' : theta_in_order,
+    'coords': coords_in_order
 })
 
-final_df.plot.scatter('theta' , 'x_points')
-final_df.plot.scatter('theta' , 'y_points')
-final_df.plot.scatter('x_points' , 'y_points')
+dataset = MyDataset(final_df['theta'] , final_df['coords'])
 
-print(final_df)
-plt.show()
+
+
+
+
+
+def reconstruct_tip(frequencies:tuple):
+    circles = Drawing(600 , 600)
+    actual_frame = np.ones((height, width, 3), dtype=np.uint8) * 255
+    
+    actual_frame = circles.draw_all_circles(one_rotation=True)#does a single rotation
+
+    points = []
+    for y in range(len(actual_frame)):
+        for x in range(len(actual_frame[y])):
+            if(frame[y, x][0] == 0):
+                points.append((y,x))
+
+    points.sort(key=lambda x: (x[0] , x[1]) ,reverse=True)
+
+    top_half_points = [point for point in points if point[1] > 300]
+
+    top_half_x_points = [point[0] for point in top_half_points]
+    top_half_y_points = [point[1] for point in top_half_points]
+
+    bottom_half_points = [point for point in points if point[1] < 300]
+
+    bottom_half_x_points = [point[0] for point in bottom_half_points]
+    bottom_half_y_points = [point[1] for point in bottom_half_points]
+
+
+    x_in_order = top_half_x_points + bottom_half_x_points
+    y_in_order = bottom_half_y_points + bottom_half_y_points
+
+    coords_in_order = []
+    for i in range(len(x_in_order)):
+        coords_in_order.append((x_in_order[i] , y_in_order[i]))
+
+
+    theta_in_order = np.arange(start=0 , stop=6 , step=6 / len(coords_in_order))
+
+    actual_points = pd.DataFrame({
+        'actual theta' : theta_in_order,
+        'actual coords': coords_in_order
+    })
+
+    return actual_points
+
+
+
+
+    
+
+
+
+
+
+
+
 
