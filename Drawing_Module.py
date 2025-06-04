@@ -1,7 +1,6 @@
 import cv2
 from CustomCircle import CustomCircle
 import numpy as np
-from Learning import Learning
 import time
 import math
 

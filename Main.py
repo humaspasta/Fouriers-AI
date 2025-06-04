@@ -1,4 +1,4 @@
-from Drawing import Drawing
+from Drawing_Module import Drawing
 
 dr = Drawing(600 , 600)
 

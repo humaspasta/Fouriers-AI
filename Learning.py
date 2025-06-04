@@ -6,7 +6,7 @@ from MyDataset import MyDataset
 import numpy as np
 import cv2
 from CustomCircle import CustomCircle
-from Drawing import Drawing
+from Drawing_Module import Drawing
 import pandas as pd
 import matplotlib.pyplot as plt
 import math
@@ -76,14 +76,29 @@ for i in range(len(x_in_order)):
     coords_in_order.append((x_in_order[i] , y_in_order[i]))
 
 
-theta_in_order = np.arange(start=0 , stop=6 , step=6 / len(coords_in_order))
+theta_in_order = np.arange(start=0 , stop=2 * math.pi , step=(2 * math.pi) / len(coords_in_order))
 
 final_df = pd.DataFrame({
     'theta' : theta_in_order,
-    'coords': coords_in_order
+    'coords': coords_in_order,
+    'X coords' : x_in_order,
+    'Y coords' : y_in_order
 })
 
+#drop duplicate points
+unique_df = final_df.groupby("X coords").first()
+
+#creating a dataset for training
 dataset = MyDataset(final_df['theta'] , final_df['coords'])
+
+#training the AI
+
+
+
+ 
+
+
+
 
 
 
@@ -91,6 +106,15 @@ dataset = MyDataset(final_df['theta'] , final_df['coords'])
 
 
 def reconstruct_tip(frequencies:tuple):
+    '''
+    Method for retrieving actual values.
+    Works by tracing between 0 and 2pi and returning the resulting data.
+    Resulting data will be used for calculating an error
+    Error will be represented as the magnitude of a vector with each
+    component of the vector containing an error for x and y. 
+    Minimizing the mangitude of the error  vector is crucial to model success.
+    
+    '''
     circles = Drawing(600 , 600)
     actual_frame = np.ones((height, width, 3), dtype=np.uint8) * 255
     
@@ -127,8 +151,13 @@ def reconstruct_tip(frequencies:tuple):
 
     actual_points = pd.DataFrame({
         'actual theta' : theta_in_order,
-        'actual coords': coords_in_order
+        'actual coords': coords_in_order,
+        'actual X coords' : x_in_order,
+        'actual y coords' : y_in_order
     })
+
+    #drop duplicate points
+    actual_points = final_df.groupby("X coords").first()
 
     return actual_points
 
