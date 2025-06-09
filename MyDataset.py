@@ -1,18 +1,25 @@
 import torch
 from torch.utils.data import Dataset
+import pandas as pd
 
 class MyDataset(Dataset):
-    def __init__(self, data, labels):
-        self.data = data #scalars representing overall rotation angle
-        self.labels = labels # tensor representing positions (x,y) that the point should be at
+    def __init__(self, theta:pd.Series, x_points:pd.Series , y_points:pd.Series):
+        '''
+        Data: The actual output from the model
+        Lables: The expected output
+        '''
+        if len(theta) != len(x_points) or len(theta) != len(y_points):
+            raise ValueError("dataframe sizes are not the same")
+        
+
+        self.theta = torch.tensor(theta) #scalars representing overall rotation angle
+        self.x = torch.tensor(x_points) # tensor representing position x given theta
+        self.y = torch.tensor(y_points) #tensor representing position y given theta
 
     def __len__(self): 
-        return len(self.data)
+        return len(self.theta)
 
     def __getitem__(self, idx):
-        x = torch.tensor(self.data[idx] , dtype=torch.float32)
-        y = torch.tensor(self.labels[idx] , dtype=torch.float32)
-        return x, y
-
+        return (self.theta.iloc[idx] , self.x.iloc[idx] , self.y.iloc[idx] , self.theta)
 
 

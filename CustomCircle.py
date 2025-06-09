@@ -1,7 +1,6 @@
 import cv2
 import math
 class CustomCircle:
-
     def __init__(self, frame, x:int , y:int, radius:int, angle_change:int, isTip=False):
         self.x = x
         self.y = y
@@ -28,7 +27,7 @@ class CustomCircle:
         # Draw radius line
         cv2.line(self.frame, (self.x, self.y), (int(x_rot) , int(y_rot)), 100, 1)
         trace_points.append(self.calculate_rotate())
-        print(trace_points)
+
 
         self.angle += self.angle_change
 
