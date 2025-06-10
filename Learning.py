@@ -111,7 +111,8 @@ output_freqs = model.freqs
 
 draws = Drawing()
 
-draws.set_circle_omega(tuple(output_freqs))
+print(output_freqs)
+draws.set_circle_omega(tuple(output_freqs/10))
 
 draws.draw_all_circles()
 
