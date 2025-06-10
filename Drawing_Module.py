@@ -6,7 +6,7 @@ import math
 import random
 
 class Drawing:
-    def __init__(self, length , width):
+    def __init__(self, length=600 , width=600):
         self.length = length
         self.width = width
         self.frame = np.ones((self.length, self.width, 3), dtype=np.uint8) * 255
@@ -41,17 +41,17 @@ class Drawing:
     def get_tip_frame(self):
         return self.circ5.get_frame()
     
-    def set_circle_frequencies(self , frequencies:tuple):
-        freq1, freq2, freq3, freq4, freq5, freq6, freq7 = frequencies
-        self.circ.set_frequency(freq1)
-        self.circ2.set_frequency(freq2)
-        self.circ3.set_frequency(freq3)
-        self.circ4.set_frequency(freq4)
-        self.circ5.set_frequency(freq5)
-        self.circ6.set_frequency(freq6)
-        self.circ7.set_frequency(freq7)
+    def set_circle_omega(self , frequencies:tuple):
+        omega1, omega2, omega3, omega4, omega5, omega6, omega7 = frequencies
+        self.circ.set_omega(omega1)
+        self.circ2.set_omega(omega2)
+        self.circ3.set_omega(omega3)
+        self.circ4.set_omega(omega4)
+        self.circ5.set_omega(omega5)
+        self.circ6.set_omega(omega6)
+        self.circ7.set_omega(omega7)
 
-    def draw_all_circles_once(self , theta_points , frequencies) -> tuple:
+    def draw_all_circles_once(self , omegas) -> tuple:
         '''
         Draws with a single rotation. Draws with respect to time and returns the frame
         '''
@@ -64,11 +64,9 @@ class Drawing:
        
         frame_trace = np.ones((height, width, 3), dtype=np.uint8) * 255
         x_0 , y_0 = self.circ.get_center()
-        if theta_points == None:
-            raise ValueError("theta_points is null")
         
-        self.set_circle_frequencies(tuple(frequencies))
-        
+        self.set_circle_omega(tuple(omegas))
+        timed_points = []
         while curr_time <= 10:
             
             frame = np.ones((height, width, 3), dtype=np.uint8) * 255
@@ -98,10 +96,16 @@ class Drawing:
             self.circ7.draw_circle()
             #point circle to trace on result frame
             cv2.circle(frame_trace , (int(self.circ7.calculate_rotate()[0]) , int(self.circ7.calculate_rotate()[1])), 1, (0,0,0), 1, cv2.LINE_AA) # point that traces values of overall rotation on second frame
-            time.sleep(1)
-            curr_time += 1
 
-        return similar_points #returns a tuple of lists. the first list contains theta points , the second contains x and y points
+            cv2.circle(frame, (height//2, width//2),200, (255,255,0), thickness=1)
+
+
+            time.sleep(delay)
+
+            timed_points.append((curr_time , int(self.circ7.calculate_rotate()[0]) , int(self.circ7.calculate_rotate()[1])))
+            curr_time += delay
+
+        return timed_points #returns a tuple of lists. the first list contains theta points , the second contains x and y points
 
     
 
@@ -126,7 +130,6 @@ class Drawing:
 
         
         while True:
-           
             #tracing point
             frame = np.ones((height, width, 3), dtype=np.uint8) * 255
             #frame = torch.ones(height , width, 3) * 255

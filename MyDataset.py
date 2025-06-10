@@ -3,23 +3,23 @@ from torch.utils.data import Dataset
 import pandas as pd
 
 class MyDataset(Dataset):
-    def __init__(self, theta:pd.Series, x_points:pd.Series , y_points:pd.Series):
+    def __init__(self, time, x_points, y_points):
         '''
         Data: The actual output from the model
         Lables: The expected output
         '''
-        if len(theta) != len(x_points) or len(theta) != len(y_points):
+        if len(time) != len(x_points) or len(time) != len(y_points):
             raise ValueError("dataframe sizes are not the same")
         
 
-        self.theta = torch.tensor(theta) #scalars representing overall rotation angle
-        self.x = torch.tensor(x_points) # tensor representing position x given theta
-        self.y = torch.tensor(y_points) #tensor representing position y given theta
+        self.time = time #scalars representing overall rotation angle
+        self.x = x_points # tensor representing position x given theta
+        self.y = y_points #tensor representing position y given theta
 
     def __len__(self): 
-        return len(self.theta)
+        return len(self.time)
 
     def __getitem__(self, idx):
-        return (self.theta.iloc[idx] , self.x.iloc[idx] , self.y.iloc[idx] , self.theta)
+        return (self.time[idx] , self.x[idx] , self.y[idx])
 
 

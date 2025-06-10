@@ -59,7 +59,7 @@ class CustomCircle:
         y_rot = self.y - self.radius * math.sin(self.angle)
         return (x_rot , y_rot)
     
-    def set_frequency(self, angle_change:float):
+    def set_omega(self, angle_change:float):
         self.angle_change = angle_change
     
     def set_color(self , color:tuple):

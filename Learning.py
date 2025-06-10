@@ -14,50 +14,50 @@ from pytorch_lightning import Trainer
 import torch
 from Sampling import DataProcessing
 
+
 class Learning(pl.LightningModule):
-    def __init__(self , num_circles):
+    def __init__(self , num_circles=7):
         super().__init__()
-        self.paramters = torch.nn.Parameter(torch.rand(num_circles))
+        self.epoch_counter = 1
+        self.freqs = torch.nn.Parameter(torch.rand(num_circles))
         self.layer1 = nn.Linear(7 , 14, True)
         self.activation = nn.ReLU()
         self.layer2 = nn.Linear(14, 7, True)
-        self.loss_fn= lambda x,y : math.sqrt(x**2 + y**2)
-    
-    def forward(self , x):
-        x = self.layer1(x)
-        x = self.activation(x)
-        x = self.layer2(x)
-        return x # returns final predicted frequencies
-    
-    
-    def reconstruct_tip(frequencies:tuple , theta_points):
-        '''
-        Method for retrieving actual values.
-        Works by tracing between 0 and 30 seconds and returning the resulting data.
-        Will only sample points that are already in theta_points iterable argument.
-        '''
-        circles = Drawing(600 , 600)
         
-        points = circles.draw_all_circles_once(theta_points , frequencies)#does a single rotation
-        pass
     
-
-    #revise so that we are able to backpropogate. We must find another way of retrieving expected x and y values given a theta. 
+    def forward(self):
+        return self.freqs # returns final predicted frequencies
+    
     def training_step(self , batch , batchidx):
-        theta , x_0 , y_0, theta_points = batch #retrieving data from the batch
-        predicted_frequencies = self(x)
-
-        predicted_dataframe = self.reconstruct_tip(predicted_frequencies , theta_points)
-        predicted_dataframe.groupby('actual_theta')
-        x , y = predicted_dataframe.loc[theta]
-
+        time_0 , x_0 , y_0 = batch #retrieving data from the batch
+        predicted_omegas = self()
+        sampler = DataProcessing()
+        time , x , y = sampler.sample_frame(predicted_omegas)
+        print(x_0.shape)
+        print(y_0.shape)
+        print()
+        print(y.shape)
+        print(x.shape)
         #Vectorize error:
-        error_vector = [x - x_0 , y - y_0]
+        index_of_time = (time == time_0).nonzero(as_tuple=True)[0]
 
-        loss = self.loss_fn(error_vector[0]**2  , error_vector[1]**2)
+        loss_x = torch.nn.functional.mse_loss(x, x_0)
+        
+        loss_y = torch.nn.functional.mse_loss(y, y_0)
+        loss = loss_x + loss_y
+
         self.log("train_loss", loss)
         return loss
+    
+    def configure_optimizers(self):
+        return torch.optim.Adam(self.parameters(), lr=0.001)
 
+    def on_train_epoch_end(self):
+        drawing = Drawing()
+        print("Starting drawing for epoch: " + " " + str(self.epoch_counter))
+        drawing.set_circle_omega(tuple(self.freqs))
+        drawing.draw_all_circles()
+        return super().on_train_epoch_end()
 
 
 ##################################################################################################################################
@@ -71,24 +71,38 @@ Actual Data processing here:
 5. For points that are similar, take an average
 
 '''
+
+if torch.backends.mps.is_available():
+    device = torch.device("mps")
+elif torch.cuda.is_available():
+    device = torch.device("cuda")
+else:
+    device = torch.device("cpu")
+
+
+
 width, height = 600, 600
 
 frame = np.ones((height, width, 3), dtype=np.uint8) * 255
 cv2.circle(frame , (height//2, width//2),200, (0,0,0), thickness=1)
 
-data_processor = DataProcessing(frame , 10)
+data_processor = DataProcessing() #sampling training data
 
-labels = data_processor.sample_frame()
-
+times , XPoses , YPoses = data_processor.sample_circle()
 
 #creating a dataset for training
-dataset = MyDataset(labels['theta'] , labels['X Coords'], labels['Y Coords'])
+dataset = MyDataset(times , XPoses, YPoses)
 
 dataloader = DataLoader(dataset=dataset, batch_size=1)
 
 trainer = Trainer(max_epochs=20)
 
-trainer.fit(Learning , dataloader)
+model = Learning().to(device)
+
+print("Training")
+trainer.fit(model , dataloader)
+
+
 #training the Deep Learning algorithm
 
 
