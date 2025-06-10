@@ -8,4 +8,7 @@ class DataProcessing:
         self.frame = frame_to_sample
 
     def sample_frame(self):
+        '''
+        Returns a dataframe of positions with a respective time value
+        '''
         pass

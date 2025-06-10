@@ -33,47 +33,13 @@ class Learning(pl.LightningModule):
     def reconstruct_tip(frequencies:tuple , theta_points):
         '''
         Method for retrieving actual values.
-        Works by tracing between 0 and 2pi and returning the resulting data.
+        Works by tracing between 0 and 30 seconds and returning the resulting data.
         Will only sample points that are already in theta_points iterable argument.
         '''
         circles = Drawing(600 , 600)
         
         points = circles.draw_all_circles_once(theta_points , frequencies)#does a single rotation
-
-        points.sort(key=lambda x: (x[0]) )
-
-        top_half_points = [point for point in points if point[1] > 300]
-
-        top_half_x_points = [point[0] for point in top_half_points]
-        top_half_y_points = [point[1] for point in top_half_points]
-
-        bottom_half_points = [point for point in points if point[1] < 300]
-
-        bottom_half_x_points = [point[0] for point in bottom_half_points]
-        bottom_half_y_points = [point[1] for point in bottom_half_points]
-
-
-        x_in_order = top_half_x_points + bottom_half_x_points
-        y_in_order = top_half_y_points + bottom_half_y_points
-
-        coords_in_order = []
-        for i in range(len(x_in_order)):
-            coords_in_order.append((x_in_order[i] , y_in_order[i]))
-
-
-        theta_in_order = np.arange(start=0 , stop=6 , step=6 / len(coords_in_order))
-
-        actual_points = pd.DataFrame({
-            'actual theta' : theta_in_order,
-            'actual coords': coords_in_order,
-            'actual X coords' : x_in_order,
-            'actual Y coords' : y_in_order
-        })
-
-        #drop duplicate points
-        actual_points = final_df.groupby("X coords").first()
-
-        return actual_points
+        pass
     
 
     #revise so that we are able to backpropogate. We must find another way of retrieving expected x and y values given a theta. 
