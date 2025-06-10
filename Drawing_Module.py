@@ -4,6 +4,7 @@ import numpy as np
 import time
 import math
 import random
+import torch
 
 class Drawing:
     def __init__(self, length=600 , width=600):
@@ -11,13 +12,13 @@ class Drawing:
         self.width = width
         self.frame = np.ones((self.length, self.width, 3), dtype=np.uint8) * 255
 
-        self.circ = CustomCircle(None, 300 , 300, 100 , 0.02) # there is no frame initially. The frame is updated in the loop
-        self.circ2 = CustomCircle(None , int(self.circ.calculate_rotate()[0]), int(self.circ.calculate_rotate()[1]), 100 , 0.01)
-        self.circ3 = CustomCircle(None , int(self.circ2.calculate_rotate()[0]), int(self.circ2.calculate_rotate()[1]) , 50 , 0.05)
-        self.circ4 = CustomCircle(None , int(self.circ3.calculate_rotate()[0]), int(self.circ3.calculate_rotate()[1]), 25, 0.07)
-        self.circ5 = CustomCircle(None , int(self.circ4.calculate_rotate()[0]), int(self.circ4.calculate_rotate()[1]) , 12 , random.random())
-        self.circ6 = CustomCircle(None , int(self.circ5.calculate_rotate()[0]), int(self.circ5.calculate_rotate()[1]), 6, 0.1)
-        self.circ7 = CustomCircle(None , int(self.circ6.calculate_rotate()[0]), int(self.circ6.calculate_rotate()[1]), 3 , 0.03 , isTip=True)
+        self.circ = CustomCircle(None, 300 , 300, 100 , torch.pi / 2, 0.02) # there is no frame initially. The frame is updated in the loop
+        self.circ2 = CustomCircle(None , int(self.circ.calculate_rotate()[0]), int(self.circ.calculate_rotate()[1]), 100, torch.pi/2, 0.01)
+        self.circ3 = CustomCircle(None , int(self.circ2.calculate_rotate()[0]), int(self.circ2.calculate_rotate()[1]) , 50 , torch.pi/2, 0.05)
+        self.circ4 = CustomCircle(None , int(self.circ3.calculate_rotate()[0]), int(self.circ3.calculate_rotate()[1]), 25, torch.pi/2, 0.07)
+        self.circ5 = CustomCircle(None , int(self.circ4.calculate_rotate()[0]), int(self.circ4.calculate_rotate()[1]) , 12 , torch.pi/2, random.random())
+        self.circ6 = CustomCircle(None , int(self.circ5.calculate_rotate()[0]), int(self.circ5.calculate_rotate()[1]), 6, torch.pi/2, 0.1)
+        self.circ7 = CustomCircle(None , int(self.circ6.calculate_rotate()[0]), int(self.circ6.calculate_rotate()[1]), 3 , torch.pi/2, 0.03 , isTip=True)
 
 
     def get_approximations():
@@ -50,6 +51,28 @@ class Drawing:
         self.circ5.set_omega(omega5)
         self.circ6.set_omega(omega6)
         self.circ7.set_omega(omega7)
+
+    def set_all_radius(self , radii:tuple):
+        radii1, radii2, radii3, radii4, radii5, radii6, radii7 = radii
+        self.circ.set_radius(radii1)
+        self.circ2.set_radius(radii2)
+        self.circ3.set_radius(radii3)
+        self.circ4.set_radius(radii4)
+        self.circ5.set_radius(radii5)
+        self.circ6.set_radius(radii6)
+        self.circ7.set_radius(radii7)
+
+    def set_all_phase(self , phases:tuple):
+        assert type(phases) == tuple
+        phase1, phase2, phase3, phase4, phase5, phase6, phase7 = phases
+        self.circ.set_phase(phase1)
+        self.circ2.set_phase(phase2)
+        self.circ3.set_phase(phase3)
+        self.circ4.set_phase(phase4)
+        self.circ5.set_phase(phase5)
+        self.circ6.set_phase(phase6)
+        self.circ7.set_phase(phase7)
+
 
     def draw_all_circles_once(self , omegas) -> tuple:
         '''
@@ -121,10 +144,9 @@ class Drawing:
         angle = 0
         fps = 60
         delay = 1 / fps
-        total_frame = np.ones((height, width, 3), dtype=np.uint8) * 255
 
         frame_trace = np.ones((height, width, 3), dtype=np.uint8) * 255
-        point_circle = CustomCircle(frame_trace , 0, 0, 1, 0, (0,0,255))
+        point_circle = CustomCircle(frame_trace , 0, 0, 1, 0, 0, (0,0,255))
         
         background = np.ones((height, width, 3), dtype=np.uint8) * 255
 

@@ -1,12 +1,12 @@
 import cv2
 import math
 class CustomCircle:
-    def __init__(self, frame, x:int , y:int, radius:int, angle_change:int, color=(0,0,0), isTip=False):
+    def __init__(self, frame, x:int , y:int, radius:int, phase:int, angle_change:int, color=(0,0,0), isTip=False):
         self.x = x
         self.y = y
         self.frame = frame
         self.radius = radius
-        self.angle = 0
+        self.angle = phase
         self.angle_change = angle_change
         self.isTip = isTip
         self.color = color
@@ -27,14 +27,13 @@ class CustomCircle:
 
         # Draw radius line
         cv2.line(self.frame, (self.x, self.y), (int(x_rot) , int(y_rot)), 100, 1)
-        trace_points.append(self.calculate_rotate())
+        
 
 
         self.angle += self.angle_change
 
         if self.angle > 2 * math.pi:
             self.angle -= 2 * math.pi
-            trace_points = []
 
     def set_frame(self, frame):
         '''
@@ -62,6 +61,9 @@ class CustomCircle:
     def set_omega(self, angle_change:float):
         self.angle_change = angle_change
     
+    def set_radius(self , radius):
+        self.radius = radius
+    
     def set_color(self , color:tuple):
         self.color = color
 
@@ -79,6 +81,10 @@ class CustomCircle:
         '''
         self.x = x
         self.y = y
+    
+    def set_phase(self , phase):
+        self.angle = phase
+
     
 
             

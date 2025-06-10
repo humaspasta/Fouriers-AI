@@ -40,16 +40,14 @@ class DataProcessing:
     #     return times , Xpos , Ypos
 
 
-    def sample_frame(self, omegas, radius=200, T=10, N=600):
+    def sample_frame(self, omegas, radii, phases, T=10, N=600):
         t = torch.linspace(0, T, N, device=omegas.device)
         x = torch.zeros(N, device=omegas.device)
         y = torch.zeros(N, device=omegas.device)
 
-        for i, omega in enumerate(omegas):
-            phase = 0  # you could also learn this
-            r = radius / (i + 1)
-            x += r * torch.cos(2 * torch.pi * omega * t + phase)
-            y += r * torch.sin(2 * torch.pi * omega * t + phase)
+        for i in range(len(omegas)):
+            x += radii[i] * torch.cos(2 * torch.pi * omegas[i] * t + phases[i])
+            y += radii[i] * torch.sin(2 * torch.pi * omegas[i] * t + phases[i])
 
         return t, x, y
     

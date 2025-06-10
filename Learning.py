@@ -20,20 +20,22 @@ class Learning(pl.LightningModule):
         super().__init__()
         self.epoch_counter = 1
         self.freqs = torch.nn.Parameter(torch.rand(num_circles))
+        self.radii = torch.nn.Parameter(torch.rand(num_circles) * 100)
+        self.phases = torch.nn.Parameter(torch.rand(num_circles) * 2 * torch.pi)
         self.layer1 = nn.Linear(7 , 14, True)
         self.activation = nn.ReLU()
         self.layer2 = nn.Linear(14, 7, True)
         
     
     def forward(self):
-        return self.freqs # returns final predicted frequencies
+        return self.freqs, self.radii, self.phases # returns final predicted frequencies
     
     def training_step(self , batch , batchidx):
         time_0 , x_0 , y_0 = batch #retrieving data from the batch
-        predicted_omegas = self()
+        predicted_omegas, predicted_radii, predicted_phases = self()
         sampler = DataProcessing()
 
-        time , x , y = sampler.sample_frame(predicted_omegas)
+        time , x , y = sampler.sample_frame(predicted_omegas, predicted_radii , predicted_phases)
 
         #Vectorize error:
         # Find indices where time matches time_0 exactly
@@ -47,11 +49,13 @@ class Learning(pl.LightningModule):
             # Take first matching index if multiple found
             index = indices[0]
 
-        loss_x = torch.nn.functional.mse_loss(x[index], x_0)
-        loss_y = torch.nn.functional.mse_loss(y[index], y_0)
-        loss = loss_x + loss_y
+        dist_squared = (x[index] - x_0)**2 + (y[index] - y_0)**2
 
+        loss = torch.sqrt(dist_squared + 1e-8)
+
+        
         self.log("train_loss", loss)
+        print("total loss: " + str(loss))
         return loss
     
     def configure_optimizers(self):
@@ -100,7 +104,7 @@ dataset = MyDataset(times , XPoses, YPoses)
 
 dataloader = DataLoader(dataset=dataset, batch_size=1)
 
-trainer = Trainer(max_epochs=20)
+trainer = Trainer(max_epochs=200, log_every_n_steps=1)
 
 model = Learning().to(device)
 
@@ -108,11 +112,21 @@ print("Training")
 trainer.fit(model , dataloader)
 
 output_freqs = model.freqs
+output_phase = model.phases
+output_radii = model.radii.int()
+
+print("Output radii here: " + str(output_radii))
+
 
 draws = Drawing()
 
-print(output_freqs)
-draws.set_circle_omega(tuple(output_freqs/10))
+print(output_freqs , output_phase, output_radii)
+
+draws.set_circle_omega(tuple(output_freqs.detach().cpu().numpy()/10))
+draws.set_all_radius(tuple(output_radii.detach().cpu().numpy()))
+draws.set_all_phase(tuple(output_phase.detach().cpu().numpy()))
+
+
 
 draws.draw_all_circles()
 
