@@ -157,6 +157,8 @@ class Drawing:
             point_circle.update_position(int(self.circ7.calculate_rotate()[0]), int(self.circ7.calculate_rotate()[1]))
             point_circle.draw_circle()
 
+            cv2.circle(frame , (300 , 300) , 200 , (255,255,0), 1)
+
 
             combined = cv2.addWeighted(frame_trace, 0.5, frame, 0.5, 0)
         

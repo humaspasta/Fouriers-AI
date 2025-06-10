@@ -32,18 +32,23 @@ class Learning(pl.LightningModule):
         time_0 , x_0 , y_0 = batch #retrieving data from the batch
         predicted_omegas = self()
         sampler = DataProcessing()
-        time , x , y = sampler.sample_frame(predicted_omegas)
-        print(x_0.shape)
-        print(y_0.shape)
-        print()
-        print(y.shape)
-        print(x.shape)
-        #Vectorize error:
-        index_of_time = (time == time_0).nonzero(as_tuple=True)[0]
 
-        loss_x = torch.nn.functional.mse_loss(x, x_0)
-        
-        loss_y = torch.nn.functional.mse_loss(y, y_0)
+        time , x , y = sampler.sample_frame(predicted_omegas)
+
+        #Vectorize error:
+        # Find indices where time matches time_0 exactly
+        indices = (time == time_0).nonzero(as_tuple=True)[0]
+
+        if indices.numel() == 0:
+            # No exact match: find closest index
+            diff = torch.abs(time - time_0)
+            index = torch.argmin(diff)
+        else:
+            # Take first matching index if multiple found
+            index = indices[0]
+
+        loss_x = torch.nn.functional.mse_loss(x[index], x_0)
+        loss_y = torch.nn.functional.mse_loss(y[index], y_0)
         loss = loss_x + loss_y
 
         self.log("train_loss", loss)
@@ -53,10 +58,10 @@ class Learning(pl.LightningModule):
         return torch.optim.Adam(self.parameters(), lr=0.001)
 
     def on_train_epoch_end(self):
-        drawing = Drawing()
-        print("Starting drawing for epoch: " + " " + str(self.epoch_counter))
-        drawing.set_circle_omega(tuple(self.freqs))
-        drawing.draw_all_circles()
+        # drawing = Drawing()
+        # print("Starting drawing for epoch: " + " " + str(self.epoch_counter))
+        # drawing.set_circle_omega(tuple(self.freqs))
+        # drawing.draw_all_circles()
         return super().on_train_epoch_end()
 
 
@@ -102,6 +107,13 @@ model = Learning().to(device)
 print("Training")
 trainer.fit(model , dataloader)
 
+output_freqs = model.freqs
+
+draws = Drawing()
+
+draws.set_circle_omega(tuple(output_freqs))
+
+draws.draw_all_circles()
 
 #training the Deep Learning algorithm
 
