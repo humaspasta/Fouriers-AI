@@ -1,7 +1,7 @@
 import cv2
 import math
 class CustomCircle:
-    def __init__(self, frame, x:int , y:int, radius:int, angle_change:int, isTip=False):
+    def __init__(self, frame, x:int , y:int, radius:int, angle_change:int, color=(0,0,0), isTip=False):
         self.x = x
         self.y = y
         self.frame = frame
@@ -9,6 +9,7 @@ class CustomCircle:
         self.angle = 0
         self.angle_change = angle_change
         self.isTip = isTip
+        self.color = color
         
 
     def draw_circle(self):
@@ -19,7 +20,7 @@ class CustomCircle:
         if self.frame is None:
             raise ValueError("Frame was not set")
         
-        #cv2.circle(self.frame, (self.x, self.y), self.radius, (255, 0, 0), 1)
+        cv2.circle(self.frame, (self.x, self.y), self.radius, self.color, 1)
 
         x_rot = self.calculate_rotate()[0]
         y_rot = self.calculate_rotate()[1]
@@ -61,7 +62,9 @@ class CustomCircle:
     def set_frequency(self, angle_change:float):
         self.angle_change = angle_change
     
-    
+    def set_color(self , color:tuple):
+        self.color = color
+
     def trace(self):
         if self.isTip:
             self.frame[int(self.calculate_rotate()[1]) , int(self.calculate_rotate()[0])] = (0,0,0)
