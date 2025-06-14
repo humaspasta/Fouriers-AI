@@ -48,8 +48,8 @@ class Learning(pl.LightningModule):
         #     # Take first matching index if multiple found
         #     index = indices[0]
 
-        #error is now in terms of euclidian distance
-        loss = F.mse_loss(torch.sqrt(x**2 + y**2) , torch.sqrt(x_0**2 + y_0**2))
+        #error is now in terms of manhattan distance
+        loss = torch.mean(torch.abs(x - x_0) + torch.abs(y - y_0))
         self.log("train_loss", loss)
         print("total loss: " + str(loss))
         return loss
