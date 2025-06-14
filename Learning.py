@@ -36,7 +36,7 @@ class Learning(pl.LightningModule):
         predicted_omegas, predicted_radii, predicted_phases = self()
         sampler = DataProcessing()
 
-        time , x , y = sampler.sample_frame(predicted_omegas, predicted_radii , predicted_phases)
+        time , x , y = sampler.sample_frame(predicted_omegas, predicted_radii , predicted_phases, N=len(time_0))
 
         # indices = (time == time_0).nonzero(as_tuple=True)[0]
 
@@ -48,7 +48,8 @@ class Learning(pl.LightningModule):
         #     # Take first matching index if multiple found
         #     index = indices[0]
 
-        loss = F.mse_loss(y , y_0)
+        #error is now in terms of euclidian distance
+        loss = F.mse_loss(torch.sqrt(x**2 + y**2) , torch.sqrt(x_0**2 + y_0**2))
         self.log("train_loss", loss)
         print("total loss: " + str(loss))
         return loss
@@ -97,9 +98,9 @@ times , XPoses , YPoses = data_processor.sample_circle()
 #creating a dataset for training
 dataset = MyDataset(times , XPoses, YPoses)
 
-dataloader = DataLoader(dataset=dataset, batch_size=10)
+dataloader = DataLoader(dataset=dataset, batch_size=20)
 
-trainer = Trainer(max_epochs=8000, log_every_n_steps=1)
+trainer = Trainer(max_epochs=10000)
 
 model = Learning().to(device)
 
