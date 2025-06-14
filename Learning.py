@@ -49,7 +49,9 @@ class Learning(pl.LightningModule):
         #     index = indices[0]
 
         #error is now in terms of manhattan distance
-        loss = torch.mean(torch.abs(x - x_0) + torch.abs(y - y_0))
+        actual_distances = torch.sqrt(torch.pow(x - x_0 , 2) + torch.pow(y - y_0 , 2))
+        expected_distance = torch.sqrt(torch.pow(x - 300 , 2) + torch.pow(y - 300 , 2))
+        loss = F.mse_loss(actual_distances , expected_distance)
         self.log("train_loss", loss)
         print("total loss: " + str(loss))
         return loss
