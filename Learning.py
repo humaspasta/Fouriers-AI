@@ -13,6 +13,7 @@ import math
 from pytorch_lightning import Trainer
 import torch
 from Sampling import DataProcessing
+import torch.nn.functional as F
 
 
 class Learning(pl.LightningModule):
@@ -37,23 +38,17 @@ class Learning(pl.LightningModule):
 
         time , x , y = sampler.sample_frame(predicted_omegas, predicted_radii , predicted_phases)
 
-        #Vectorize error:
-        # Find indices where time matches time_0 exactly
-        indices = (time == time_0).nonzero(as_tuple=True)[0]
+        # indices = (time == time_0).nonzero(as_tuple=True)[0]
 
-        if indices.numel() == 0:
-            # No exact match: find closest index
-            diff = torch.abs(time - time_0)
-            index = torch.argmin(diff)
-        else:
-            # Take first matching index if multiple found
-            index = indices[0]
+        # if indices.numel() == 0:
+        #     # No exact match: find closest index
+        #     diff = torch.abs(time - time_0)
+        #     index = torch.argmin(diff)
+        # else:
+        #     # Take first matching index if multiple found
+        #     index = indices[0]
 
-        dist_squared = (x[index] - x_0)**2 + (y[index] - y_0)**2
-
-        loss = torch.sqrt(dist_squared + 1e-8)
-
-        
+        loss = F.mse_loss(y , y_0)
         self.log("train_loss", loss)
         print("total loss: " + str(loss))
         return loss
@@ -102,9 +97,9 @@ times , XPoses , YPoses = data_processor.sample_circle()
 #creating a dataset for training
 dataset = MyDataset(times , XPoses, YPoses)
 
-dataloader = DataLoader(dataset=dataset, batch_size=1)
+dataloader = DataLoader(dataset=dataset, batch_size=10)
 
-trainer = Trainer(max_epochs=200, log_every_n_steps=1)
+trainer = Trainer(max_epochs=8000, log_every_n_steps=1)
 
 model = Learning().to(device)
 

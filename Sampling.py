@@ -40,7 +40,7 @@ class DataProcessing:
     #     return times , Xpos , Ypos
 
 
-    def sample_frame(self, omegas, radii, phases, T=10, N=600):
+    def sample_frame(self, omegas, radii, phases, T=10, N=10):
         t = torch.linspace(0, T, N, device=omegas.device)
         x = torch.zeros(N, device=omegas.device)
         y = torch.zeros(N, device=omegas.device)
