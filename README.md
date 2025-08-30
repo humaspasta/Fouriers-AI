@@ -4,8 +4,6 @@ Having learning about the Fourier Series in its discrete form, I wanted to attem
 
 My basic idea here was to take advantage of the Fourier Series and pair it with a deep learning algorithm that would use the frequencies, radii, and phase of 7 different circles in order to re-draw a given input pattern (in my case a circle of radius 200 to start). As the algorithm learns the correct values for all three paramters, the Fourier Series in its discrete form, should output the exact same pattern periodically. 
 
-This model is not generalizable and works on a single piece of data at a time. It re-trains on this data so that it can get exact values and fit to the pattern as perfectly as it can. This may defeat the purpose of deep learning algorithms but becomes especially useful when the patten becomes more and more complicated. While there are other mathematical ways of doing something like this...I dont care. 
-
 The next steps are to reduce error and try and fit the model to other kinds of images. This could be any  sort of polar graph or custom image that a user wants to insert. 
 
 
