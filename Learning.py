@@ -19,13 +19,10 @@ import torch.nn.functional as F
 class Learning(pl.LightningModule):
     def __init__(self , num_circles=7):
         super().__init__()
-        self.epoch_counter = 1
         self.freqs = torch.nn.Parameter(torch.rand(num_circles))
         self.radii = torch.nn.Parameter(torch.rand(num_circles) * 100)
         self.phases = torch.nn.Parameter(torch.rand(num_circles) * 2 * torch.pi)
-        self.layer1 = nn.Linear(7 , 14, True)
-        self.activation = nn.ReLU()
-        self.layer2 = nn.Linear(14, 7, True)
+      
         
     
     def forward(self):
@@ -38,20 +35,9 @@ class Learning(pl.LightningModule):
 
         time , x , y = sampler.sample_frame(predicted_omegas, predicted_radii , predicted_phases, N=len(time_0))
 
-        # indices = (time == time_0).nonzero(as_tuple=True)[0]
-
-        # if indices.numel() == 0:
-        #     # No exact match: find closest index
-        #     diff = torch.abs(time - time_0)
-        #     index = torch.argmin(diff)
-        # else:
-        #     # Take first matching index if multiple found
-        #     index = indices[0]
-
         #error is now in terms of manhattan distance
-        actual_distances = torch.sqrt(torch.pow(x - x_0 , 2) + torch.pow(y - y_0 , 2))
-        expected_distance = torch.sqrt(torch.pow(x - 300 , 2) + torch.pow(y - 300 , 2))
-        loss = F.mse_loss(actual_distances , expected_distance)
+        
+        loss = F.mse_loss(x_0 + y_0 , x + y)
         self.log("train_loss", loss)
         print("total loss: " + str(loss))
         return loss
@@ -95,14 +81,14 @@ cv2.circle(frame , (height//2, width//2),200, (0,0,0), thickness=1)
 
 data_processor = DataProcessing() #sampling training data
 
-times , XPoses , YPoses = data_processor.sample_circle()
+times , XPoses , YPoses = data_processor.sample_circle(N=100)
 
 #creating a dataset for training
 dataset = MyDataset(times , XPoses, YPoses)
 
-dataloader = DataLoader(dataset=dataset, batch_size=20)
+dataloader = DataLoader(dataset=dataset, batch_size=100)
 
-trainer = Trainer(max_epochs=10000)
+trainer = Trainer(max_epochs=20000)
 
 model = Learning().to(device)
 
