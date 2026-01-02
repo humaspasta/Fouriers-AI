@@ -1,9 +1,18 @@
 # Fouriers-AI
 
-Having learning about the Fourier Series in its discrete form, I wanted to attempt a project where I explored this idea in the context of artifical intelligence. The Fourier Series is a formula that sums up a lot of wave functions in order to estimate another function. This is much like the Taylor Series except for the fact that the Taylor Series uses Polynomial instead. Series such as the Taylor Series and the Fourier Series are very helpful in the context of regression and AI and are used in many other fields of engineering and mathematics. 
+This project explores a novel approach to fitting and learning periodic trajectories, such as circles or other parametric curves, using concepts inspired by classical PID (Proportional-Integral-Derivative) control. Traditional curve-fitting methods often struggle with stability and long-term divergence, particularly when optimizing multi-rotation trajectories.
 
-My basic idea here was to take advantage of the Fourier Series and pair it with a deep learning algorithm that would use the frequencies, radii, and phase of 7 different circles in order to re-draw a given input pattern (in my case a circle of radius 200 to start). As the algorithm learns the correct values for all three paramters, the Fourier Series in its discrete form, should output the exact same pattern periodically. 
+We introduce a differentiable, PD-inspired loss function that combines:
 
-The next steps are to reduce error and try and fit the model to other kinds of images. This could be any  sort of polar graph or custom image that a user wants to insert. 
+Proportional (P) term: measures instantaneous Euclidean distance between predicted and target points.
+
+Derivative (D) term: captures the rate of change of error along the curve, promoting smoothness and reducing overshoot.
+
+Optional Integral (I) term: initially explored to accumulate past error, though removed to improve long-term stability.
+
+This project also explores other forms of error and their affects on Fourier Series based approximations. 
+
+Quick Result Description: The PID error method given <50,000 epochs was capable of finding a set of values for each circle that could near perfectly fit an input circle of size 200 for nearly two full rotations. For > 2 rotations, the graph begins to diverge from the path assigned to it. This issue most likely arises from the training itself and not from the error function. More on this later. 
 
 
+The outcome demonstrates a novel methodology for stable, differentiable trajectory fitting, leveraging control theory principles in a machine learning context. This framework is applicable to any periodic or parametric trajectory learning task, potentially extending to robotics, animation, and other domains requiring precise motion replication.
