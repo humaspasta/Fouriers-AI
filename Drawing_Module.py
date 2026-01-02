@@ -133,6 +133,19 @@ class Drawing:
     
 
     def draw_all_circles(self):
+
+
+        '''
+        Output radii here: tensor([55, 17, 63, 81, 38, 24, 30], dtype=torch.int32)
+Parameter containing:
+tensor([0.1006, 0.5998, 0.1004, 0.0994, 0.5608, 0.5927, 0.5564],
+       requires_grad=True) Parameter containing:
+tensor([-0.0100,  9.7299,  6.2770,  0.0108, -1.5660,  0.5405,  1.7178],
+       requires_grad=True) tensor([55, 17, 63, 81, 38, 24, 30], dtype=torch.int32)
+       Test output of PID method
+        '''
+
+
         '''
         Draws all circles with frequencies
         '''

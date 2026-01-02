@@ -17,11 +17,17 @@ import torch.nn.functional as F
 
 
 class Learning(pl.LightningModule):
+
+
+
     def __init__(self , num_circles=7):
         super().__init__()
         self.freqs = torch.nn.Parameter(torch.rand(num_circles))
         self.radii = torch.nn.Parameter(torch.rand(num_circles) * 100)
         self.phases = torch.nn.Parameter(torch.rand(num_circles) * 2 * torch.pi)
+        self.ki = torch.tensor(0.0)
+        self.kp = torch.tensor(0.0)
+        self.kd = torch.tensor(0.0)
       
         
     
@@ -37,10 +43,32 @@ class Learning(pl.LightningModule):
 
         #error is now in terms of manhattan distance
         
-        loss = F.mse_loss(x_0 + y_0 , x + y)
+        loss = self.get_PID_Error(x, x_0 , y , y_0)
+
         self.log("train_loss", loss)
         print("total loss: " + str(loss))
         return loss
+    
+    def get_PID_Error(self, x:torch.tensor, x_0:torch.tensor, y:torch.tensor, y_0:torch.tensor):
+
+
+        e = torch.sqrt(torch.pow(x - x_0 , 2) + torch.pow(y - y_0 , 2))
+        self.kp = e.mean()
+
+        # self.ki  = self.ki.detach() +self.kp 
+        
+        dx = x[1:] - x[:-1]
+        dy = y[1:] - y[:-1]
+        delta_s = torch.sqrt(dx**2 + dy**2)
+
+        de = e[1:] - e[:-1]             # shape [N-1]
+        D = de / (delta_s + 1e-8)       # add small eps to prevent div by 0
+
+        self.kd = D.mean()
+
+        return self.kp + self.kd
+
+
     
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=0.001)
@@ -83,12 +111,13 @@ data_processor = DataProcessing() #sampling training data
 
 times , XPoses , YPoses = data_processor.sample_circle(N=100)
 
+
 #creating a dataset for training
 dataset = MyDataset(times , XPoses, YPoses)
 
 dataloader = DataLoader(dataset=dataset, batch_size=100)
 
-trainer = Trainer(max_epochs=20000)
+trainer = Trainer(max_epochs=50000)
 
 model = Learning().to(device)
 
@@ -114,7 +143,8 @@ draws.set_all_phase(tuple(output_phase.detach().cpu().numpy()))
 
 draws.draw_all_circles()
 
-#training the Deep Learning algorithm
+
+# #training the Deep Learning algorithm
 
 
 
@@ -132,12 +162,50 @@ draws.draw_all_circles()
 
 
 
+#     # import tensorflow as tf
+# # from CustomCircle import CustomCircle
+# # from Sampling import DataProcessing
+# # from MyDataset import MyDataset
+# # from Drawing_Module import Drawing
+# # import keras
+# # from keras import layers
+
+
+
+
+# # class deep_learning():
+# #     def __init__(self):
+# #         self.model = keras.Sequential()
     
+# #     def create_model(self):
+# #         self.model.add(layers.Input(shape=(7,)),
+# #                        layers.Dense(128, activation='ReLU'),
+# #                        layers.Dense(64, activation='ReLU'),
+# #                        layers.Dropout(0.2),
+# #                        layers.Dense(32, activation='ReLU'),
+# #                        layers.Dense(14,))
+
+# #     def train_model(self):
+# #         self.model.fit()
 
 
 
+# '''
+# Output radii here: tensor([25, 82, 34, 58,  9, 66, 61], dtype=torch.int32)
+# Parameter containing:
+# tensor([ 0.1005, -0.0997,  0.0998,  0.1003,  0.2815,  0.2815,  0.2815],
+#        requires_grad=True) Parameter containing:
+# tensor([6.2376, 7.8043, 6.1651, 0.0193, 5.8348, 3.6157, 6.8794],
+#        requires_grad=True) tensor([25, 82, 34, 58,  9, 66, 61], dtype=torch.int32)
+# #results in the drawing of an ellipse of exact radius of circle
+# '''
 
-
-
-
-
+'''
+Output radii here: tensor([55, 17, 63, 81, 38, 24, 30], dtype=torch.int32)
+Parameter containing:
+tensor([0.1006, 0.5998, 0.1004, 0.0994, 0.5608, 0.5927, 0.5564],
+       requires_grad=True) Parameter containing:
+tensor([-0.0100,  9.7299,  6.2770,  0.0108, -1.5660,  0.5405,  1.7178],
+       requires_grad=True) tensor([55, 17, 63, 81, 38, 24, 30], dtype=torch.int32)
+#output of model with pid error
+'''

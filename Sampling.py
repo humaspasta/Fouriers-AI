@@ -63,6 +63,61 @@ class DataProcessing:
         t_tensor = torch.tensor(t, dtype=torch.float32).to(self.device)
         x_tensor = torch.tensor(x, dtype=torch.float32).to(self.device)
         y_tensor = torch.tensor(y, dtype=torch.float32).to(self.device)
+
         
         return t_tensor, x_tensor, y_tensor
 
+
+
+
+
+
+
+
+
+# import cv2
+# import numpy as np
+# from Drawing_Module import Drawing
+# import pandas as pd
+# import tensorflow as tf
+# import keras
+# import torch
+
+
+# class DataProcessing:
+
+#     def __init__(self):
+#         self.drawing = Drawing()
+
+
+#     def sample_circle(N=100):
+        
+
+#     def sample_frame(self , omegas):
+#         '''
+#         Returns a dataframe of positions with a respective time value
+#         Frame: np dataframe used in open cv for drawing
+#         ''' 
+#         drawing = Drawing()
+
+#         list_of_times = drawing.draw_all_circles_once(omegas)
+#         times = []
+#         Xpos = []
+#         Ypos = []
+
+#         for time , x , y in list_of_times:
+#             times.append(time)
+#             Xpos.append(x)
+#             Ypos.append(y)
+        
+#         times = torch.tensor(times, dtype=torch.float32).to(self.device)
+#         Xpos = torch.tensor(Xpos, dtype=torch.float32).to(self.device)
+#         Ypos = torch.tensor(Ypos, dtype=torch.float32).to(self.device)
+
+#         return times , Xpos , Ypos
+
+#     def sample_frame(self, omegas):
+#         frame = self.drawing.draw_all_circles_once(omegas)
+
+
+        

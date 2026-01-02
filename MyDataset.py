@@ -11,7 +11,6 @@ class MyDataset(Dataset):
         if len(time) != len(x_points) or len(time) != len(y_points):
             raise ValueError("dataframe sizes are not the same")
         
-
         self.time = time #scalars representing overall rotation angle
         self.x = x_points # tensor representing position x given theta
         self.y = y_points #tensor representing position y given theta
