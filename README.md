@@ -1,4 +1,4 @@
-# Fouriers-AI
+# Trajectory Fitting Using Deep Learning, the discrete Fourier series, and PID inspired loss function
 
 This project explores a novel approach to fitting and learning periodic trajectories, such as circles or other parametric curves, using concepts inspired by classical PID (Proportional-Integral-Derivative) control. Traditional curve-fitting methods often struggle with stability and long-term divergence, particularly when optimizing multi-rotation trajectories.
 
